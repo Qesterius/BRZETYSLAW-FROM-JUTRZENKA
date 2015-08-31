@@ -1,0 +1,486 @@
+<!doctype html>
+<HTML lang="pl">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>GRZETYSLAW FROM JUTRZEMKA</title>
+	<link rel=stylesheet type=text/css href="style.css">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+</head>
+<body>
+	<div id=lokienko>
+		<div id="CONTENT">
+
+			<div id="MENU">
+			
+				<div class="menupositi"><button onclick="SZKLEP()" id="SZKLEP" class="menuposition"></a></div>
+				<div class="menupositi"><a href="" id="CHARACTERS" class="menuposition"></a></div>
+				<div class="menupositi"><button onclick="MIDedit()"  id="PLEJ" class="menuposition"></button></div>
+				<div class="menupositi"><a href="" id="EKWIPMENCIK" class="menuposition"></a></div>
+				<div class="menupositi"><a href=""  id="FIENDS" class="menuposition"></a></div>
+				
+							<div class= "clear"></div>
+							
+				<div class="menupositionTXT">SZKLEP</div>
+				<div class="menupositionTXT">KARAKTERZY</div>
+				<div class="menupositionTXT">PLEJ</div>
+				<div class="menupositionTXT">EKWIPMENCIK</div>
+				<div class="menupositionTXT">FIENDS</div>
+				
+			</div>
+			<div id="bckgr">
+				<div id="MID"></div>
+			</div>
+		</div>
+
+		<div class="rectangle"></div>
+
+		<div id="SPODEK">
+
+			<div class="BOT"></div>
+			<div id="LAUNCHER"><button onclick="MIDedit()">CANVAS</button><button onclick="kupa()">KUPA</button></div>
+			<div class="BOT"></div>
+			<div class= "clear"></div>
+		</div>
+	</div>
+	
+	<script src="http://127.0.0.1:1337/socket.io/lib/socket.io.js"></script>
+	<script>
+	//SOKET.IJO
+	var socket = io.connect('http://127.0.0.1:1337');
+	socket.on("message", function(msg){
+		console.log(msg);
+	});
+	
+	socket.on("update", function(ludz){
+		soket.ludziki = ludz;
+		socket.emit("request", null);
+		ping.update();
+	});
+	socket.on("playerupdate", function(data){
+		KARAKTER.pos = data.pos;
+		KARAKTER.vel = data.vel;
+	});
+	
+	var soket = {
+		id: false,
+		ludziki: []
+	}
+	
+	var ping = {
+		delay: 0,
+		last: new Date(),
+		update: function(){
+			var d = new Date();
+			ping.delay = parseInt(d.getTime()) - parseInt(ping.last.getTime());
+			ping.last = d;
+		}
+	}
+	
+	
+	//ToGame
+	
+	
+	function	PREJER(x,  y){
+					this.pos = { x: x, y: y };
+					this.vel = { x: 0, y: 0 };
+					this.sp = 20;
+					this.head = 0;
+					this.torso = 0;
+					this.legs = 0;
+					this.accesor = 0;
+					this.walk = 0;
+					this.walking = 0;
+					this.p1p2t = TORSOS;
+					this.p1p2l = LEGZ;
+				}
+	function	CAMERA(x,y){
+					this.pos = { x: x, y: y };
+					this.vel = { x: 0, y: 0 };
+	}
+	var kamera = new CAMERA(0,0);
+			//000000000000000000000000000000000000000000000000_____________________________________________________OBRAZKI
+			var ACCESOR = new Image();
+			
+			var HEADZ = new Image();
+			var TORSOS = new Image();
+			var LEGZ = new Image();
+
+			var torsosc = new Image();
+			var legsc = new Image();
+			
+			
+			
+			var TORSOSl = new Image();
+			var LEGZl = new Image();
+			
+			
+			ACCESOR.src = ("czopy/ACCESORIES1.png")
+			
+			HEADZ.src = ("czopy/HEADSALLLCORRECT1.png");
+			TORSOS.src = ("czopy/TORSOSALL1.png");
+			LEGZ.src = ("czopy/LEGSALL1.png");
+			
+			TORSOSl.src = ("czopy/TORSOSALL1LEFT.png");
+			LEGZl.src = ("czopy/LEGSALL1left.png");
+			
+			var ludziki = [];
+			var KARAKTER = new PREJER(1920/2,1080/2);
+			ludziki.push(new PREJER(100,500));
+			//soket
+			socket.emit("init", KARAKTER);
+			socket.once("id", function(id){
+				soket.id = id;
+				socket.emit("request", null);
+			});
+			//WLACZNIK
+				var wlacznik = 0;
+			//==========================================================================================================================================PLEJ
+			
+			function addKOPKARAKTER(){
+			if(wlacznik == 1){
+				window.addEventListener('keydown', function(event){
+					switch(event.keyCode){
+					  case 65: //LEFT
+						ludziki[0].vel.x =-ludziki[0].sp;
+					break;
+					 case 87://UP
+						ludziki[0].vel.y =-ludziki[0].sp;
+					break;
+				   	 case 68://RIGHT
+						ludziki[0].vel.x =ludziki[0].sp;
+					break;
+					 case 83://DOWN
+						ludziki[0].vel.y =ludziki[0].sp;
+					break;
+					}
+				}
+			);
+			
+				window.addEventListener('keyup', function(event){
+					switch(event.keyCode){
+					 case 65: //LEFT
+						ludziki[0].vel.x =0;
+					break;
+					 case 87://UP
+						ludziki[0].vel.y =0;
+					break;
+				   	 case 68://RIGHT
+						ludziki[0].vel.x =0;
+					break;
+					 case 83://DOWN
+						ludziki[0].vel.y =0;
+					break;
+					}
+				}
+			);
+			}
+			}
+			
+			function MIDedit(){
+				if(wlacznik == 1){
+					location.reload();
+				}
+				wlacznik++;
+				document.getElementById('MID').innerHTML = 	"<canvas id='game' width=1920 height=1080> "+" </canvas>"; 
+				var canvas = document.getElementById("game");
+				var ctx = canvas.getContext("2d");
+				ctx.clearRect(0,0,1920,1080);
+				dupa = 1;
+			
+				addKOPKARAKTER();
+			//------------------------------------------------------------------KEYS
+				window.addEventListener('keydown', function(event){
+					var data = {id: soket.id, x: "niet", y: "niet"};
+					switch(event.keyCode){
+					  case 37: //LEFT
+						KARAKTER.vel.x =-KARAKTER.sp;
+						data.x = -1;
+					break;
+					 case 38://UP
+						KARAKTER.vel.y =-KARAKTER.sp;
+						data.y = -1;
+					break;
+				   	 case 39://RIGHT
+						KARAKTER.vel.x =KARAKTER.sp;
+						data.x = 1;
+					break;
+					 case 40://DOWN
+						KARAKTER.vel.y =KARAKTER.sp;
+						data.y = 1;
+					break;
+					}
+					socket.emit("pos", data);
+				}
+			);
+				window.addEventListener('keyup', function(event){
+					var data = {id: soket.id, x: "niet", y: "niet"};
+					switch(event.keyCode){
+					 case 37: //LEFT
+						KARAKTER.vel.x =0;
+						data.x = 0;
+					break;
+					 case 38://UP
+						KARAKTER.vel.y =0;
+						data.y = 0;
+					break;
+				   	 case 39://RIGHT
+						KARAKTER.vel.x =0;
+						data.x = 0;
+					break;
+					 case 40://DOWN
+						KARAKTER.vel.y =0;
+						data.y = 0;
+					break;
+					}
+					socket.emit("pos", data);
+				}
+			);
+			//KAMERA
+				/*window.addEventListener('keydown', function(event){
+					switch(event.keyCode){
+					  case 65: //LEFT
+						kamera.vel.x =-kamera.sp;
+					break;
+					 case 87://UP
+						kamera.vel.y =-kamera.sp;
+					break;
+				   	 case 68://RIGHT
+						kamera.vel.x =kamera.sp;
+					break;
+					 case 83://DOWN
+						kamera.vel.y =kamera.sp;
+					break;
+					}
+				}
+			);
+			
+				window.addEventListener('keyup', function(event){
+					switch(event.keyCode){
+					 case 65: //LEFT
+						kamera.vel.x =0;
+					break;
+					 case 87://UP
+						kamera.vel.y =0;
+					break;
+				   	 case 68://RIGHT
+						kamera.vel.x =0;
+					break;
+					 case 83://DOWN
+						kamera.vel.y =0;
+					break;
+					}
+				}
+			);*/
+			//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ANIMATIONS
+			setInterval(function(){
+				if(KARAKTER.vel.x != 0 || KARAKTER.vel.y != 0)
+			{
+					if(KARAKTER.walk = 0)
+					{
+						KARAKTER.walk = 1;
+					}
+					if(KARAKTER.walk = 1)
+						{KARAKTER.walk = 2;}	
+			}
+				else{
+					KARAKTER.walk = 0;
+				
+				}
+				}, 40);
+				
+				setInterval(function(){
+				if(KARAKTER.vel.x != 0 || KARAKTER.vel.y != 0)
+			{
+					if(KARAKTER.walk = 2)
+					{KARAKTER.walk = 1;}
+			}
+				else{
+					KARAKTER.walk = 0;
+				
+				}
+				}, 52);
+				
+				setInterval(function(){
+				
+					if(KARAKTER.vel.x > 0.1)
+					{
+						KARAKTER.p1p2t = TORSOS;
+						KARAKTER.p1p2l = LEGZ;
+					}
+					if(KARAKTER.vel.x < -0.1)
+					{
+						KARAKTER.p1p2t = TORSOSl;
+						KARAKTER.p1p2l = LEGZl;
+					}
+				
+				},50);
+				
+				//LUDZIKI
+				
+				
+				setInterval(function(){
+					if(KARAKTER.pos.x < (kamera.pos.x + 320)){
+						kamera.vel.x =-KARAKTER.sp;
+					}
+					if(KARAKTER.pos.x > (kamera.pos.x + 1620)){
+						kamera.vel.x =KARAKTER.sp;
+					}
+					if(KARAKTER.pos.y < (kamera.pos.y + 200)){
+						kamera.vel.y =-KARAKTER.sp;
+					}
+					if(KARAKTER.pos.y > (kamera.pos.y + 880)){
+						kamera.vel.y =KARAKTER.sp;
+					}
+					
+					if(KARAKTER.pos.x > (kamera.pos.x + 420) && KARAKTER.pos.x < (kamera.pos.x + 1520)){
+						kamera.vel.x =0;
+					}
+					if(KARAKTER.pos.y > (kamera.pos.y + 300) && KARAKTER.pos.y < (kamera.pos.y + 780)){
+						kamera.vel.y =0;
+					}
+					
+					
+				},50);
+			//**************************************************************************************DRAWCHAR
+			function drawCHAR(CHAR){
+				ctx.drawImage(HEADZ,200*CHAR.head,CHAR.walk*200,200,200,-75,-75,150,150);
+				ctx.drawImage(ACCESOR,200*CHAR.accesor,0,200,200,-75,-75,150,150);
+				ctx.drawImage(CHAR.p1p2t,200*CHAR.torso,CHAR.walk*200,200,200,-75,-75,150,150);
+				ctx.drawImage(CHAR.p1p2l,200*CHAR.legs,CHAR.walk*200,200,200,-75,-75,150,150);
+			}
+			
+			//**************************************************************************************RENDERING
+			setInterval(function(){
+				ctx.clearRect(0,0,1920,1080);
+				ctx.font = "30px Arial";
+				ctx.fillText("ping: "+ping.delay,10,50);
+				ctx.translate(-kamera.pos.x,-kamera.pos.y);	
+					ctx.fillStyle = "#FF0000";
+					ctx.fillRect(0,0,1920,1080);
+					
+					ctx.translate(KARAKTER.pos.x,	KARAKTER.pos.y);
+						drawCHAR(KARAKTER);
+					ctx.translate(-KARAKTER.pos.x,	-KARAKTER.pos.y);
+					for(var i=0; i<ludziki.length; i++){
+					if(ludziki[i]){
+						ctx.translate(ludziki[i].pos.x,	ludziki[i].pos.y);
+							drawCHAR(ludziki[i]);
+						ctx.translate(-ludziki[i].pos.x,-ludziki[i].pos.y);
+					}}
+				ctx.translate(kamera.pos.x,kamera.pos.y);	
+				
+			}, 25);
+			setInterval(function(){
+				KARAKTER.pos.x += KARAKTER.vel.x;
+				KARAKTER.pos.y += KARAKTER.vel.y;
+				/*if(soket.ludziki[soket.id]){
+					if(!soket.ludziki[soket.id].old){
+						KARAKTER.pos = soket.ludziki[soket.id].pos;
+						soket.ludziki[soket.id].old = true;
+					}
+				}*/
+			}, 25);
+			setInterval(function(){
+				kamera.pos.x += kamera.vel.x;
+				kamera.pos.y += kamera.vel.y;
+			}, 25);
+			
+			setInterval(function(){
+				for(var i=0; i<ludziki.length; i++){
+				if(ludziki[i]){
+				ludziki[i].pos.x += ludziki[i].vel.x;
+				ludziki[i].pos.y += ludziki[i].vel.y;
+				}}
+				if(soket.id){
+					ludziki =[];
+					for(var i=0; i<soket.ludziki.length; i++){
+					if(soket.ludziki[i]){
+						var pos = soket.ludziki[i].pos;
+						if(i != soket.id) ludziki.push(new PREJER(pos.x,pos.y));
+					}
+					}
+				}	
+			}, 25);
+			}
+			//-----------------------------------------------------------------------------------------PENTA
+			function kupa(){
+
+			var canvas = document.getElementById("game");
+			var ctx = canvas.getContext("2d");
+				ctx.strokeStyle = "#FFFFFF"
+			//MORDA GÓRNA1
+				ctx.moveTo(80,80);
+						ctx.lineTo(85,85);
+					ctx.lineTo(130,110);
+				ctx.lineTo(170,110);
+					ctx.lineTo(210,85);
+						ctx.lineTo(215,80);
+			//PRZEDZIAŁKA POMIĘDZY1
+					ctx.lineTo(215,90);
+			//PRZEDZIAŁKA POMIĘDZY2
+					ctx.lineTo(215,120);
+			//MORDA DOLNA2
+						ctx.lineTo(210,125);
+						ctx.lineTo(170,150);
+						ctx.lineTo(130,150);
+						ctx.lineTo(85,125);
+						ctx.lineTo(80,120);
+						ctx.lineTo(80,80);
+						
+			//Pentagram prawy
+				ctx.moveTo(50,10);
+				ctx.lineTo(70,70);
+				ctx.lineTo(20,30);
+				ctx.lineTo(80,30);
+				ctx.lineTo(30,70);
+				ctx.lineTo(50,10);
+			//Pentagram prawy drugi
+				ctx.moveTo(250,10);
+				ctx.lineTo(270,70);
+				ctx.lineTo(220,30);
+				ctx.lineTo(280,30);
+				ctx.lineTo(230,70);
+				ctx.lineTo(250,10);
+				ctx.stroke();
+				ctx.stroke();
+				ctx.stroke();
+				
+				//Pentagram prawy CIEŃ
+				ctx.moveTo(50,12);
+				ctx.lineTo(70,72);
+				ctx.lineTo(20,32);
+				ctx.lineTo(80,32);
+				ctx.lineTo(30,72);
+				ctx.lineTo(50,12);
+			//Pentagram prawy drugi CIEŃ
+				ctx.moveTo(250,12);
+				ctx.lineTo(270,72);
+				ctx.lineTo(220,32);
+				ctx.lineTo(280,32);
+				ctx.lineTo(230,72);
+				ctx.lineTo(250,12);
+				ctx.stroke();
+				
+			}
+			
+			//==========================================================================================================================================PLEJ
+			//SZKLEP
+			function SZKLEP(){
+				document.getElementById('MID').innerHTML = 
+				"<div id=pozycje>"
+						+"<button  class=sklepPosition class=sklepPosBut>"+"Bronie"+"</button>"
+						+"<button  class=sklepPosition class=sklepPosBut>"+"Zbroje"+"</button>"
+						+"<button  class=sklepPosition class=sklepPosBut>"+"Busty"+"</button>"
+						+"<button  class=sklepPosition class=sklepPosBut>"+"Pierdółki"+"</button>"
+						+"<button  class=sklepPosition class=sklepPosBut>"+"Skórki"+"</button>"
+					+"</div>"
+				+"<div id=kupa>"
+					+"</div>"
+				+"<div class= clear>"
+					+"</div>";
+			}
+	//iSize W=1280
+	//iSize H=768
+	</script>
+</body>
+</HTML>
